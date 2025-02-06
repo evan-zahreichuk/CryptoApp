@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using CryptoApp.Models;
 using CryptoApp.Services;
+
 namespace CryptoApp.ViewModels
 {
     public class CurrencyListViewModel : BaseViewModel
@@ -34,19 +35,27 @@ namespace CryptoApp.ViewModels
             }
         }
         public ICommand NavigateConverterCommand { get; set; }
+        public ICommand NextPageCommand { get; set; }
+        public ICommand PreviousPageCommand { get; set; }
+        public int CurrentPage { get; set; }
+
         public CurrencyListViewModel()
         {
-            string apiKey = "1df5b82e-ed64-4b29-b27c-0b5f4abcbe83"; // Replace with your actual API key
+            string apiKey = "1df5b82e-ed64-4b29-b27c-0b5f4abcbe83";
             _apiService = new CoinMarketCapApiService(apiKey);
             Currencies = new ObservableCollection<Currency>();
             FilteredCurrencies = new ObservableCollection<Currency>();
             NavigateConverterCommand = new RelayCommand(o => NavigateToConverter());
+            NextPageCommand = new RelayCommand(o => {/* Implement next page logic */});
+            PreviousPageCommand = new RelayCommand(o => {/* Implement previous page logic */});
+            CurrentPage = 1;
             LoadCurrencies();
         }
         private async void LoadCurrencies()
         {
             var data = await _apiService.GetTopCurrenciesAsync();
-            Application.Current.Dispatcher.Invoke(() => {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
                 Currencies.Clear();
                 foreach (var c in data)
                     Currencies.Add(c);
