@@ -1,0 +1,20 @@
+﻿<Page x:Class="CryptoApp.Views.CurrencyListView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="CurrencyListView">
+    <Grid>
+        <StackPanel>
+            <TextBox Width="200" Margin="10" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+            <ListView ItemsSource="{Binding FilteredCurrencies}" SelectedItem="{Binding SelectedCurrency}" Margin="10" SelectionChanged="ListView_SelectionChanged">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="Symbol" DisplayMemberBinding="{Binding Symbol}"/>
+                        <GridViewColumn Header="Price" DisplayMemberBinding="{Binding PriceUsd}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <Button Content="Converter" Command="{Binding NavigateConverterCommand}" Margin="10"/>
+        </StackPanel>
+    </Grid>
+</Page>
