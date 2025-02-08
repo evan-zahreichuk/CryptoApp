@@ -1,0 +1,14 @@
+﻿<Page x:Class="CryptoApp.Views.ConverterView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="ConverterView">
+    <Grid>
+        <StackPanel Margin="10">
+            <ComboBox ItemsSource="{Binding Currencies}" SelectedItem="{Binding SelectedFromCurrency}" DisplayMemberPath="Name" Margin="10"/>
+            <ComboBox ItemsSource="{Binding Currencies}" SelectedItem="{Binding SelectedToCurrency}" DisplayMemberPath="Name" Margin="10"/>
+            <TextBox Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}" Margin="10"/>
+            <TextBlock Text="{Binding ConvertedAmount}" Margin="10"/>
+            <Button Content="Back" Command="{Binding NavigateBackCommand}" Margin="10"/>
+        </StackPanel>
+    </Grid>
+</Page>

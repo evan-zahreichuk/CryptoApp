@@ -1,0 +1,18 @@
+﻿<Page x:Class="CryptoApp.Views.CurrencyDetailView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="CurrencyDetailView">
+    <Grid>
+        <StackPanel Margin="10">
+            <TextBlock Text="{Binding Name}" FontSize="24" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Symbol}" FontSize="18"/>
+            <TextBlock Text="Price:"/>
+            <TextBlock Text="{Binding PriceUsd}"/>
+            <TextBlock Text="Volume:"/>
+            <TextBlock Text="{Binding VolumeUsd}"/>
+            <TextBlock Text="Change:"/>
+            <TextBlock Text="{Binding ChangePercent24Hr}"/>
+            <Button Content="Back" Command="{Binding NavigateBackCommand}" Margin="10"/>
+        </StackPanel>
+    </Grid>
+</Page>

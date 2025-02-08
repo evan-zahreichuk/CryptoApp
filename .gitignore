@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /CryptoApp/Services/ApiService.cs
 /CryptoApp/Models/Currency.cs
+/CryptoApp/Converters
