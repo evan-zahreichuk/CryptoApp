@@ -37,7 +37,31 @@ namespace CryptoApp.ViewModels
         public ICommand NavigateConverterCommand { get; set; }
         public ICommand NextPageCommand { get; set; }
         public ICommand PreviousPageCommand { get; set; }
-        public int CurrentPage { get; set; }
+        private int _currentPage;
+        public int CurrentPage
+        {
+            get => _currentPage;
+            set
+            {
+                _currentPage = value;
+                OnPropertyChanged(nameof(CurrentPage));
+                OnPropertyChanged(nameof(PageNumberDisplay));
+            }
+        }
+
+        public string PageNumberDisplay => CurrentPage == 1 ? " " : $" {CurrentPage}";
+
+        public int ItemsPerPage { get; set; } = 10;
+        private bool _isPreviousPageVisible;
+        public bool IsPreviousPageVisible
+        {
+            get => _isPreviousPageVisible;
+            set
+            {
+                _isPreviousPageVisible = value;
+                OnPropertyChanged(nameof(IsPreviousPageVisible));
+            }
+        }
 
         public CurrencyListViewModel()
         {
@@ -46,37 +70,74 @@ namespace CryptoApp.ViewModels
             Currencies = new ObservableCollection<Currency>();
             FilteredCurrencies = new ObservableCollection<Currency>();
             NavigateConverterCommand = new RelayCommand(o => NavigateToConverter());
-            NextPageCommand = new RelayCommand(o => {/* Implement next page logic */});
-            PreviousPageCommand = new RelayCommand(o => {/* Implement previous page logic */});
+            NextPageCommand = new RelayCommand(o => NextPage());
+            PreviousPageCommand = new RelayCommand(o => PreviousPage(), o => CurrentPage > 1);
             CurrentPage = 1;
+            IsPreviousPageVisible = false;
             LoadCurrencies();
         }
+
         private async void LoadCurrencies()
         {
-            var data = await _apiService.GetTopCurrenciesAsync();
+            int start = ((CurrentPage - 1) * ItemsPerPage) + 1;
+            var data = await _apiService.GetTopCurrenciesAsync(start, ItemsPerPage);
             Application.Current.Dispatcher.Invoke(() =>
             {
                 Currencies.Clear();
                 foreach (var c in data)
                     Currencies.Add(c);
-                FilterCurrencies();
+                if (string.IsNullOrWhiteSpace(SearchText))
+                    FilterLocalCurrencies();
             });
         }
-        private void FilterCurrencies()
+
+        private async void FilterCurrencies()
         {
-            if (Currencies == null) return;
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                FilterLocalCurrencies();
+            }
+            else
+            {
+                var searchResults = await _apiService.SearchCurrenciesAsync(SearchText);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    FilteredCurrencies.Clear();
+                    foreach (var c in searchResults)
+                        FilteredCurrencies.Add(c);
+                });
+            }
+        }
+
+        private void FilterLocalCurrencies()
+        {
             FilteredCurrencies.Clear();
-            var filtered = string.IsNullOrWhiteSpace(SearchText)
-                ? Currencies
-                : Currencies.Where(c => c.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                                        c.Symbol.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0);
-            foreach (var c in filtered)
+            foreach (var c in Currencies)
                 FilteredCurrencies.Add(c);
         }
+
         private void NavigateToConverter()
         {
             var frame = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x is MainWindow) as MainWindow;
             frame?.MainFrame.Navigate(new Views.ConverterView());
+        }
+
+        private void NextPage()
+        {
+            CurrentPage++;
+            IsPreviousPageVisible = true;
+            LoadCurrencies();
+        }
+
+        private void PreviousPage()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+                if (CurrentPage == 1)
+                    IsPreviousPageVisible = false;
+                LoadCurrencies();
+            }
         }
     }
 }

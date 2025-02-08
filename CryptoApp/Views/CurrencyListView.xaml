@@ -3,9 +3,16 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Cryptocurrency Dashboard">
     <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <SolidColorBrush x:Key="PageBackgroundBrush" Color="Black"/>
+        <SolidColorBrush x:Key="TextForegroundBrush" Color="White"/>
+        <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#FF1E3C72"/>
+        <SolidColorBrush x:Key="ButtonForegroundBrush" Color="White"/>
+
         <Style TargetType="Button">
-            <Setter Property="Background" Value="#FF1E3C72"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource ButtonForegroundBrush}"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="10,5"/>
@@ -21,8 +28,10 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
         <Style TargetType="TextBox">
-            <Setter Property="Background" Value="White"/>
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="5"/>
             <Setter Property="Template">
@@ -39,17 +48,50 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style TargetType="ListView">
+            <Setter Property="Background" Value="#222222"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style TargetType="ListViewItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <Border x:Name="Bd"
+                Background="{TemplateBinding Background}"
+                Padding="{TemplateBinding Padding}"
+                SnapsToDevicePixels="true">
+                            <ContentPresenter 
+            HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource Mode=TemplatedParent}, FallbackValue=Stretch}"
+            VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource Mode=TemplatedParent}, FallbackValue=Center}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Page.Resources>
     <Page.Background>
-        <DynamicResource ResourceKey="PageBackgroundBrush"/>
+        <StaticResource ResourceKey="PageBackgroundBrush"/>
     </Page.Background>
     <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <!-- Top Bar without theme toggle button -->
-        <DockPanel Background="#FF1E3C72" LastChildFill="False" Height="50" Grid.Row="0">
+        <DockPanel Background="Black" LastChildFill="False" Height="50" Grid.Row="0">
             <TextBlock Text="Crypto Compass" FontSize="20" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" Margin="10,0" DockPanel.Dock="Left"/>
         </DockPanel>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -60,10 +102,10 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="Cryptocurrency Dashboard" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextForegroundBrush}" Margin="0,0,0,20" HorizontalAlignment="Center" Grid.Row="0"/>
-                <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center" Width="Auto">
+                <TextBlock Text="Cryptocurrency Dashboard" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextForegroundBrush}" Margin="0,0,0,20" HorizontalAlignment="Center" Grid.Row="0"/>
+                <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center">
                     <TextBox Width="300" Height="30" Margin="0,0,0,20" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Border Background="White" CornerRadius="10" Padding="10" MinWidth="300">
+                    <Border Background="#222222" CornerRadius="10" Padding="10" MinWidth="300">
                         <ListView ItemsSource="{Binding FilteredCurrencies}" SelectedItem="{Binding SelectedCurrency}" SelectionChanged="ListView_SelectionChanged">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
@@ -73,7 +115,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Orientation="Vertical">
-                                            <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="#FF1E3C72"/>
+                                            <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource ButtonBackgroundBrush}"/>
                                             <TextBlock Text="{Binding Symbol}" FontSize="12" Foreground="Gray"/>
                                         </StackPanel>
                                         <TextBlock Grid.Column="1" Text="{Binding PriceUsd, StringFormat=C}" FontSize="14" VerticalAlignment="Center" Foreground="#FF2A5298"/>
@@ -85,8 +127,8 @@
                     <Button Content="Converter" Command="{Binding NavigateConverterCommand}" Width="150" Height="40" Margin="0,20,0,0"/>
                 </StackPanel>
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-                    <Button Content="Previous" Command="{Binding PreviousPageCommand}" Margin="5"/>
-                    <TextBlock Text="{Binding CurrentPage}" FontSize="16" Foreground="{DynamicResource TextForegroundBrush}" VerticalAlignment="Center" Margin="5"/>
+                    <Button Content="Previous" Command="{Binding PreviousPageCommand}" Margin="5" Visibility="{Binding IsPreviousPageVisible, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding CurrentPage}" FontSize="16" Foreground="{StaticResource TextForegroundBrush}" VerticalAlignment="Center" Margin="5"/>
                     <Button Content="Next" Command="{Binding NextPageCommand}" Margin="5"/>
                 </StackPanel>
             </Grid>

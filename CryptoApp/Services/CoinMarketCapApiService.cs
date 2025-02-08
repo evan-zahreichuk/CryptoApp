@@ -20,25 +20,24 @@ namespace CryptoApp.Services
             _apiKey = apiKey;
         }
 
-        public async Task<List<Currency>> GetTopCurrenciesAsync(int limit = 10)
+        public async Task<List<Currency>> GetTopCurrenciesAsync(int start, int limit)
         {
-            string url = $"{_baseUrl}cryptocurrency/listings/latest?limit={limit}&convert=USD";
+            string url = $"{_baseUrl}cryptocurrency/listings/latest?start={start}&limit={limit}&convert=USD";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("X-CMC_PRO_API_KEY", _apiKey);
-
             var response = await _client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<CoinMarketCapListingsResponse>(json);
-                return result.data.Select(item => new Currency
+                return result.Data.Select(item => new Currency
                 {
-                    Id = item.id.ToString(),
-                    Name = item.name,
-                    Symbol = item.symbol,
-                    PriceUsd = item.quote.USD.price.ToString(),
-                    VolumeUsd = item.quote.USD.volume_24h.ToString(),
-                    ChangePercent24Hr = item.quote.USD.percent_change_24h.ToString()
+                    Id = item.Id.ToString(),
+                    Name = item.Name,
+                    Symbol = item.Symbol,
+                    PriceUsd = item.Quote.USD.Price.ToString(),
+                    VolumeUsd = item.Quote.USD.Volume24H.ToString(),
+                    ChangePercent24Hr = item.Quote.USD.PercentChange24H.ToString()
                 }).ToList();
             }
             else
@@ -49,26 +48,24 @@ namespace CryptoApp.Services
 
         public async Task<Currency> GetCurrencyDetailAsync(string id)
         {
-            // Для детальної інформації використовується endpoint quotes/latest
             string url = $"{_baseUrl}cryptocurrency/quotes/latest?id={id}&convert=USD";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("X-CMC_PRO_API_KEY", _apiKey);
-
             var response = await _client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<CoinMarketCapQuoteResponse>(json);
-                if (result.data.TryGetValue(id, out CoinQuote coinQuote))
+                if (result.Data.TryGetValue(id, out CoinQuote coinQuote))
                 {
                     return new Currency
                     {
                         Id = id,
-                        Name = coinQuote.name,
-                        Symbol = coinQuote.symbol,
-                        PriceUsd = coinQuote.quote.USD.price.ToString(),
-                        VolumeUsd = coinQuote.quote.USD.volume_24h.ToString(),
-                        ChangePercent24Hr = coinQuote.quote.USD.percent_change_24h.ToString()
+                        Name = coinQuote.Name,
+                        Symbol = coinQuote.Symbol,
+                        PriceUsd = coinQuote.Quote.USD.Price.ToString(),
+                        VolumeUsd = coinQuote.Quote.USD.Volume24H.ToString(),
+                        ChangePercent24Hr = coinQuote.Quote.USD.PercentChange24H.ToString()
                     };
                 }
                 else
@@ -82,43 +79,46 @@ namespace CryptoApp.Services
             }
         }
 
-        private class CoinMarketCapListingsResponse
+        public async Task<List<Currency>> SearchCurrenciesAsync(string searchQuery)
         {
-            public List<CoinData> data { get; set; }
-        }
-
-        private class CoinData
-        {
-            public int id { get; set; }
-            public string name { get; set; }
-            public string symbol { get; set; }
-            public QuoteData quote { get; set; }
-        }
-
-        private class QuoteData
-        {
-            [JsonProperty("USD")]
-            public UsdData USD { get; set; }
-        }
-
-        private class UsdData
-        {
-            public decimal price { get; set; }
-            public decimal volume_24h { get; set; }
-            public decimal percent_change_24h { get; set; }
-        }
-
-        private class CoinMarketCapQuoteResponse
-        {
-            public Dictionary<string, CoinQuote> data { get; set; }
-        }
-
-        private class CoinQuote
-        {
-            public int id { get; set; }
-            public string name { get; set; }
-            public string symbol { get; set; }
-            public QuoteData quote { get; set; }
+            string mapUrl = $"{_baseUrl}cryptocurrency/map?limit=5000";
+            var mapRequest = new HttpRequestMessage(HttpMethod.Get, mapUrl);
+            mapRequest.Headers.Add("X-CMC_PRO_API_KEY", _apiKey);
+            var mapResponse = await _client.SendAsync(mapRequest);
+            if (!mapResponse.IsSuccessStatusCode)
+                throw new Exception("Error retrieving cryptocurrency map: " + mapResponse.ReasonPhrase);
+            var mapJson = await mapResponse.Content.ReadAsStringAsync();
+            var mapResult = JsonConvert.DeserializeObject<CoinMarketCapMapResponse>(mapJson);
+            var filteredCoins = mapResult.Data.Where(c => c.Name.IndexOf(searchQuery, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                                          c.Symbol.IndexOf(searchQuery, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                                          c.Slug.IndexOf(searchQuery, StringComparison.OrdinalIgnoreCase) >= 0)
+                                              .ToList();
+            if (filteredCoins.Count == 0)
+                return new List<Currency>();
+            var limitedCoins = filteredCoins.Take(1000).ToList();
+            string ids = string.Join(",", limitedCoins.Select(c => c.Id));
+            string quotesUrl = $"{_baseUrl}cryptocurrency/quotes/latest?id={ids}&convert=USD";
+            var quotesRequest = new HttpRequestMessage(HttpMethod.Get, quotesUrl);
+            quotesRequest.Headers.Add("X-CMC_PRO_API_KEY", _apiKey);
+            var quotesResponse = await _client.SendAsync(quotesRequest);
+            if (!quotesResponse.IsSuccessStatusCode)
+                throw new Exception("Error retrieving currency quotes: " + quotesResponse.ReasonPhrase);
+            var quotesJson = await quotesResponse.Content.ReadAsStringAsync();
+            var quotesResult = JsonConvert.DeserializeObject<CoinMarketCapQuoteResponse>(quotesJson);
+            return limitedCoins.Where(c => quotesResult.Data.ContainsKey(c.Id.ToString()))
+                               .Select(c =>
+                               {
+                                   var coinQuote = quotesResult.Data[c.Id.ToString()];
+                                   return new Currency
+                                   {
+                                       Id = c.Id.ToString(),
+                                       Name = c.Name,
+                                       Symbol = c.Symbol,
+                                       PriceUsd = coinQuote.Quote.USD.Price.ToString(),
+                                       VolumeUsd = coinQuote.Quote.USD.Volume24H.ToString(),
+                                       ChangePercent24Hr = coinQuote.Quote.USD.PercentChange24H.ToString()
+                                   };
+                               }).ToList();
         }
     }
 }

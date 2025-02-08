@@ -57,7 +57,7 @@ namespace CryptoApp.ViewModels
         public ICommand NavigateBackCommand { get; set; }
         public ConverterViewModel()
         {
-            string apiKey = "1df5b82e-ed64-4b29-b27c-0b5f4abcbe83"; // Replace with your actual API key
+            string apiKey = "1df5b82e-ed64-4b29-b27c-0b5f4abcbe83"; 
             _apiService = new CoinMarketCapApiService(apiKey);
             Currencies = new ObservableCollection<Currency>();
             NavigateBackCommand = new RelayCommand(o => NavigateBack());
@@ -65,8 +65,9 @@ namespace CryptoApp.ViewModels
         }
         private async void LoadCurrencies()
         {
-            var data = await _apiService.GetTopCurrenciesAsync();
-            Application.Current.Dispatcher.Invoke(() => {
+            var data = await _apiService.GetTopCurrenciesAsync(1, 100);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
                 Currencies.Clear();
                 foreach (var c in data)
                     Currencies.Add(c);
