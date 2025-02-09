@@ -1,0 +1,142 @@
+﻿<Page x:Class="CryptoApp.Views.ConverterView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Converter">
+    <Page.Resources>
+        <!-- Common Resources -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <SolidColorBrush x:Key="PageBackgroundBrush" Color="Black"/>
+        <SolidColorBrush x:Key="TextForegroundBrush" Color="White"/>
+        <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#FF1E3C72"/>
+        <SolidColorBrush x:Key="ButtonForegroundBrush" Color="White"/>
+
+        <!-- Global style for ComboBoxItem to display items with black text -->
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+
+        <!-- Button Style -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource ButtonForegroundBrush}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                    CornerRadius="5"
+                    Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- TextBox Style -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                    CornerRadius="5"
+                    Padding="{TemplateBinding Padding}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    BorderBrush="{TemplateBinding BorderBrush}">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ComboBox Style -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+
+    </Page.Resources>
+
+    <Page.Background>
+        <StaticResource ResourceKey="PageBackgroundBrush"/>
+    </Page.Background>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Navigation Bar -->
+        <DockPanel Background="Black" Height="50" Grid.Row="0">
+            <TextBlock Text="Crypto Compass" FontSize="20" FontWeight="Bold" 
+                 Foreground="White" VerticalAlignment="Center" Margin="10,0" DockPanel.Dock="Left"/>
+        </DockPanel>
+
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Page Title -->
+                <TextBlock Text="Currency Converter" FontSize="28" FontWeight="Bold" 
+                   Foreground="{StaticResource TextForegroundBrush}" 
+                   HorizontalAlignment="Center" Margin="0,0,0,20" Grid.Row="0"/>
+
+                <!-- Converter Form -->
+                <Border Background="#222222" CornerRadius="10" Padding="20" Grid.Row="1">
+                    <StackPanel>
+                        <!-- From Currency Section -->
+                        <TextBlock Text="From:" FontSize="16" Foreground="{StaticResource TextForegroundBrush}" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding Currencies}" 
+                      SelectedItem="{Binding SelectedFromCurrency}" 
+                      DisplayMemberPath="Name" Margin="0,0,0,15">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+                        </ComboBox>
+
+                        <!-- To Currency Section -->
+                        <TextBlock Text="To:" FontSize="16" Foreground="{StaticResource TextForegroundBrush}" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding Currencies}" 
+                      SelectedItem="{Binding SelectedToCurrency}" 
+                      DisplayMemberPath="Name" Margin="0,0,0,15">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+                        </ComboBox>
+
+                        <!-- Amount Input -->
+                        <TextBlock Text="Amount:" FontSize="16" Foreground="{StaticResource TextForegroundBrush}" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding Amount, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,15"/>
+
+                        <!-- Converted Amount Display -->
+                        <TextBlock Text="Converted Amount:" FontSize="16" Foreground="{StaticResource TextForegroundBrush}" Margin="0,0,0,5"/>
+                        <TextBlock Text="{Binding ConvertedAmount}" FontSize="16" Foreground="{StaticResource TextForegroundBrush}" Margin="0,0,0,15"/>
+
+                        <!-- Back Navigation -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="Back" Command="{Binding NavigateBackCommand}" Margin="5"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Page>
