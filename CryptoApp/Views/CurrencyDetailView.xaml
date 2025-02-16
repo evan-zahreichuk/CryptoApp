@@ -6,7 +6,6 @@
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
-        <!-- Видалено статичні Brush – використовуються ключі тем: BackgroundBrush, ForegroundBrush, AccentBrush -->
 
         <Style x:Key="TimeFrameButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
@@ -52,8 +51,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
-        <!-- Верхня панель для перемикання теми -->
+        
         <DockPanel Grid.Row="0" Background="{DynamicResource BackgroundBrush}" Height="50" LastChildFill="False">
             <TextBlock Text="Crypto Compass" 
                        FontSize="20" 
@@ -73,7 +71,6 @@
                     Foreground="{DynamicResource ForegroundBrush}"/>
         </DockPanel>
 
-        <!-- Зміст інформаційної частини -->
         <StackPanel Orientation="Vertical" Margin="20" Grid.Row="1">
             <TextBlock Text="{Binding DisplayTitle}" 
                        FontSize="30" 
@@ -100,7 +97,6 @@
             </StackPanel>
         </StackPanel>
 
-        <!-- Розділ з графіком -->
         <Border Grid.Row="2" Margin="20" CornerRadius="10" Background="{DynamicResource BackgroundBrush}" Padding="10">
             <lvc:CartesianChart Series="{Binding ChartSeries}"
                                 LegendLocation="None"
@@ -116,7 +112,6 @@
             </lvc:CartesianChart>
         </Border>
 
-        <!-- Футер: час оновлення та кнопка Back -->
         <StackPanel Orientation="Horizontal" 
                     HorizontalAlignment="Center" 
                     VerticalAlignment="Center" 

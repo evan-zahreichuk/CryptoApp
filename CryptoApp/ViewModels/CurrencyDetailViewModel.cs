@@ -16,7 +16,7 @@ namespace CryptoApp.ViewModels
         private readonly string _currencyId;
         private readonly string _apiKey;
         private readonly CoinMarketCapApiService _apiService;
-        private string _currentTimeframe = "1d"; // default timeframe: last 24 hours
+        private string _currentTimeframe = "1d"; 
 
         public CurrencyDetailViewModel(string currencyId, string apiKey)
         {
@@ -24,25 +24,18 @@ namespace CryptoApp.ViewModels
             _apiKey = apiKey;
             _apiService = new CoinMarketCapApiService(apiKey);
 
-            // Initialize commands first
+
             LoadChartCommand = new RelayCommand(async param =>
             {
                 _currentTimeframe = param?.ToString() ?? "1d";
                 await LoadChartData(_currentTimeframe);
             });
             NavigateBackCommand = new RelayCommand(o => NavigateBack());
-
-            // Initialize available chart currencies and default selection
             ChartCurrencies = new ObservableCollection<string> { "USD", "EUR", "UAH" };
-            // Set default after commands are initialized
             SelectedChartCurrency = "USD";
-
-            // Load currency details and initial chart data (24h)
             LoadCurrencyDetail();
             LoadChartCommand.Execute("1d");
         }
-
-        // Display properties
         private string _displayTitle;
         public string DisplayTitle
         {
@@ -95,17 +88,14 @@ namespace CryptoApp.ViewModels
             {
                 _selectedChartCurrency = value;
                 OnPropertyChanged(nameof(SelectedChartCurrency));
-                // Check if LoadChartCommand is initialized before executing
                 if (LoadChartCommand != null)
                     LoadChartCommand.Execute(_currentTimeframe);
             }
         }
 
-        // Commands
         public ICommand LoadChartCommand { get; set; }
         public ICommand NavigateBackCommand { get; set; }
 
-        // Load currency details from API
         private async void LoadCurrencyDetail()
         {
             try
@@ -122,12 +112,11 @@ namespace CryptoApp.ViewModels
             }
         }
 
-        // Load chart data based on timeframe and selected chart currency.
         private async Task LoadChartData(string timeframe)
         {
-            await Task.Delay(500); // Simulate API call delay
+            await Task.Delay(500); 
 
-            int pointsCount = 24; // default for "1d"
+            int pointsCount = 24; 
             string labelFormat = "HH:mm";
             switch (timeframe)
             {
@@ -157,7 +146,6 @@ namespace CryptoApp.ViewModels
                     break;
             }
 
-            // Determine conversion factor based on the selected chart currency.
             double conversionFactor = 1.0;
             if (SelectedChartCurrency == "EUR")
                 conversionFactor = 0.9;
@@ -207,7 +195,6 @@ namespace CryptoApp.ViewModels
             LastUpdatedText = $"Last updated: {DateTime.Now:g}";
         }
 
-        // Navigate back using the MainWindow frame.
         private void NavigateBack()
         {
             var frame = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x is MainWindow) as MainWindow;

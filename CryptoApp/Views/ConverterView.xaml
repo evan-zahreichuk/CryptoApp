@@ -67,7 +67,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Верхня панель з написом та кнопкою перемикання теми -->
         <DockPanel Background="{DynamicResource BackgroundBrush}" Height="50" Grid.Row="0">
             <TextBlock Text="Crypto Compass" 
                        FontSize="20" 
@@ -87,7 +86,6 @@
                     Foreground="{DynamicResource ForegroundBrush}"/>
         </DockPanel>
 
-        <!-- Основний контент сторінки конвертації -->
         <Border Grid.Row="1"
                 Background="{DynamicResource BackgroundBrush}" 
                 CornerRadius="10" 
