@@ -12,7 +12,6 @@ namespace CryptoApp
             string apiKey = ConfigurationManager.AppSettings["CMC_API_Key"];
             var coinMarketCapService = new CoinMarketCapApiService(apiKey);
             MainFrame.Navigate(new Views.CurrencyListView());
-
         }
     }
 }
