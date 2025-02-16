@@ -2,26 +2,23 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Converter">
+
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-        <SolidColorBrush x:Key="PageBackgroundBrush" Color="Black"/>
-        <SolidColorBrush x:Key="TextForegroundBrush" Color="White"/>
-        <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#FF1E3C72"/>
-        <SolidColorBrush x:Key="ButtonForegroundBrush" Color="White"/>
 
         <Style TargetType="ComboBoxItem">
-            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
         </Style>
         <Style TargetType="ComboBox">
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="5"/>
         </Style>
 
         <Style TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
-            <Setter Property="Foreground" Value="{StaticResource ButtonForegroundBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="10,5"/>
@@ -39,8 +36,8 @@
         </Style>
 
         <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#333333"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="5"/>
             <Setter Property="Template">
@@ -60,38 +57,48 @@
     </Page.Resources>
 
     <Page.Background>
-        <StaticResource ResourceKey="PageBackgroundBrush"/>
+        <DynamicResource ResourceKey="BackgroundBrush"/>
     </Page.Background>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <DockPanel Background="Black" Height="50" Grid.Row="0">
+        <!-- Верхня панель з написом та кнопкою перемикання теми -->
+        <DockPanel Background="{DynamicResource BackgroundBrush}" Height="50" Grid.Row="0">
             <TextBlock Text="Crypto Compass" 
                        FontSize="20" 
                        FontWeight="Bold" 
-                       Foreground="White" 
+                       Foreground="{DynamicResource ForegroundBrush}" 
                        VerticalAlignment="Center" 
                        Margin="10,0" 
                        DockPanel.Dock="Left"/>
+            <Button x:Name="ThemeSwitchButton"
+                    Width="50" Height="30"
+                    Margin="10"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Right"
+                    Click="SwitchTheme_Click"
+                    Content="🌙"
+                    Background="{DynamicResource AccentBrush}"
+                    Foreground="{DynamicResource ForegroundBrush}"/>
         </DockPanel>
 
+        <!-- Основний контент сторінки конвертації -->
         <Border Grid.Row="1"
-                Background="#222222" 
+                Background="{DynamicResource BackgroundBrush}" 
                 CornerRadius="10" 
                 BorderThickness="1" 
-                BorderBrush="#FFD700" 
+                BorderBrush="{DynamicResource AccentBrush}" 
                 Padding="20" 
                 Margin="20">
             <StackPanel>
                 <TextBlock Text="From" 
                            FontSize="16" 
-                           Foreground="{StaticResource TextForegroundBrush}" />
-
+                           Foreground="{DynamicResource ForegroundBrush}" />
                 <Grid Margin="0,0,0,15">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -106,11 +113,9 @@
                               Margin="5,0,0,0"
                               Grid.Column="1"/>
                 </Grid>
-
                 <TextBlock Text="To" 
                            FontSize="16" 
-                           Foreground="{StaticResource TextForegroundBrush}" />
-
+                           Foreground="{DynamicResource ForegroundBrush}" />
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
